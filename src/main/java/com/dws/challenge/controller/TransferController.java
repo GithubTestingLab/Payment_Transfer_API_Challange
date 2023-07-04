@@ -10,6 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 
+/**
+ * This class represents a Controller layer.
+ * It provides methods to perform operations like amount transfer
+ * from source to destination account.
+ *
+ * @author Tiwari Banktesh
+ */
 @RestController
 @RequestMapping("/v1/transfer")
 public class TransferController {
@@ -18,6 +25,12 @@ public class TransferController {
     private TransferService transferService;
 
 
+    /**
+     * Adds two numbers and returns the result.
+     *
+     * @param  transferRequest entity the first argument
+     * @return the string as message after successfully amount transfer.
+     */
    @PostMapping
     public ResponseEntity<String> transferAmount(@Valid @RequestBody TransferRequest transferRequest) {
         long accountFromId = transferRequest.getFromAccountId();
