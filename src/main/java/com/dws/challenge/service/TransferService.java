@@ -14,6 +14,13 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 
+/**
+ * This class represents a Service layer.
+ * It provides methods to perform operations like amount transfer
+ * from source to destination account.
+ *
+ * @author Tiwari Banktesh
+ */
 @Service
 public class TransferService {
 
@@ -25,6 +32,13 @@ public class TransferService {
     private static final Object lock = new Object();
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    /**
+     * Adds two numbers and returns the result.
+     *
+     * @param  accountFromId as the first argument
+     * @param  accountToId as the first argument
+     * @param  transferAmount as the first argument
+     */
     @Transactional
     public void transferMoney(Long accountFromId, Long accountToId, BigDecimal transferAmount) {
 
