@@ -1,7 +1,9 @@
 package com.dws.challenge;
 
 import com.dws.challenge.domain.Account;
+import com.dws.challenge.exception.AccountNotFoundException;
 import com.dws.challenge.exception.GlobalExceptionHandler;
+import com.dws.challenge.exception.InsufficientFundsException;
 import com.dws.challenge.repository.AccountRepository;
 import com.dws.challenge.service.NotificationService;
 import com.dws.challenge.service.PaymentNotification;
@@ -22,6 +24,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+
+import static org.junit.Assert.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 class TransferServiceTest {
@@ -80,6 +84,47 @@ class TransferServiceTest {
 				.sendNotification(fromAccountId, fromMessage);
 		Mockito.verify(paymentNotification, Mockito.times(1))
 				.sendNotification(toAccountId, toMessage);
+	}
+	//Negative Scenario
+	@Test()
+	public void testInsufficientFunds_ShouldThrowException() {
+		// Create test data
+		Long fromAccountId = 1L;
+		Long toAccountId = 2L;
+		BigDecimal transferAmount = BigDecimal.valueOf(100);
+
+		// Create mock accounts
+		Account accountFrom = new Account();
+		accountFrom.setId(fromAccountId);
+		accountFrom.setBalance(BigDecimal.valueOf(50)); // Set a lower balance than the transfer amount
+
+		Account accountTo = new Account();
+		accountTo.setId(toAccountId);
+		accountTo.setBalance(BigDecimal.valueOf(200));
+
+		// Configure account repository mock
+		Mockito.when(accountRepository.findById(fromAccountId)).thenReturn(Optional.of(accountFrom));
+		Mockito.when(accountRepository.findById(toAccountId)).thenReturn(Optional.of(accountTo));
+
+		// Perform the transfer (should throw InsufficientFundsException)
+		assertThrows(InsufficientFundsException.class, () ->
+				transferService.transferMoney(fromAccountId, toAccountId, transferAmount));
+	}
+	//Negative Scenario
+	@Test()
+	public void testAccountNotFound_ShouldThrowException() {
+		// Create test data
+		Long fromAccountId = 1L;
+		Long toAccountId = 2L;
+		BigDecimal transferAmount = BigDecimal.valueOf(100);
+
+		// Configure account repository mock to return empty Optional (account not found)
+		Mockito.when(accountRepository.findById(fromAccountId)).thenReturn(Optional.empty());
+		Mockito.when(accountRepository.findById(toAccountId)).thenReturn(Optional.empty());
+
+		// Perform the transfer (should throw AccountNotFoundException)
+		assertThrows(AccountNotFoundException.class, () ->
+		transferService.transferMoney(fromAccountId, toAccountId, transferAmount));
 	}
 
 }
